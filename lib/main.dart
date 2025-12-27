@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'My App',
+      title: 'TSM-1108',
       // Change 'home' to SplashScreen
       home: const SplashScreen(),
     );

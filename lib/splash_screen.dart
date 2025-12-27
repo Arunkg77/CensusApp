@@ -1,5 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'admin_main_screen.dart';
+import 'admin_screen.dart';
+import 'auth_helper.dart';
+import 'home_Screen.dart';
 import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -47,13 +51,25 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     );
     _fadeController.forward();
 
-    Timer(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
-    });
-  }
+// inside splash_screen.dart initState
+    Timer(const Duration(seconds: 3), () async {
+      // Check login status
+      final status = await AuthHelper.getLoginStatus();
+
+      if (!mounted) return;
+
+      if (status['isLoggedIn'] == true) {
+        // Route based on user type
+        Widget nextScreen = status['userType'] == AuthHelper.userTypeAdmin
+            ? const AdminMainScreen()
+            : const HomeScreen();
+
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => nextScreen));
+      } else {
+        // Not logged in, go to Login
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginScreen()));
+      }
+    });  }
 
   @override
   void dispose() {
@@ -89,56 +105,9 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             }),
 
             // Rotating outer glow ring
-            Center(
-              child: AnimatedBuilder(
-                animation: _rotateAnimation,
-                builder: (context, child) {
-                  return Transform.rotate(
-                    angle: _rotateAnimation.value * 2 * 3.14159,
-                    child: Container(
-                      width: MediaQuery.of(context).size.width * 0.95,
-                      height: MediaQuery.of(context).size.width * 0.95,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: SweepGradient(
-                          colors: [
-                            Colors.transparent,
-                            Color(0xFF4A148C).withOpacity(0.3),
-                            Color(0xFFFF6F00).withOpacity(0.4),
-                            Color(0xFF00BCD4).withOpacity(0.3),
-                            Colors.transparent,
-                          ],
-                          stops: [0.0, 0.25, 0.5, 0.75, 1.0],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
+
 
             // Pulsing glow effect
-            Center(
-              child: AnimatedBuilder(
-                animation: _pulseAnimation,
-                builder: (context, child) {
-                  return Container(
-                    width: MediaQuery.of(context).size.width * 0.85 * _pulseAnimation.value,
-                    height: MediaQuery.of(context).size.width * 0.85 * _pulseAnimation.value,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          Color(0xFFFF6F00).withOpacity(0.4),
-                          Color(0xFF4A148C).withOpacity(0.3),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
 
             // Main image with fade in
             Center(
@@ -193,89 +162,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             ),
 
             // Bottom loading with sacred geometry effect
-            Positioned(
-              bottom: 80,
-              left: 0,
-              right: 0,
-              child: FadeTransition(
-                opacity: _fadeAnimation,
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        // Outer rotating ring
-                        AnimatedBuilder(
-                          animation: _rotateController,
-                          builder: (context, child) {
-                            return Transform.rotate(
-                              angle: -_rotateAnimation.value * 2 * 3.14159,
-                              child: Container(
-                                width: 70,
-                                height: 70,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Color(0xFFFF6F00).withOpacity(0.5),
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        // Inner rotating ring
-                        AnimatedBuilder(
-                          animation: _rotateController,
-                          builder: (context, child) {
-                            return Transform.rotate(
-                              angle: _rotateAnimation.value * 2 * 3.14159,
-                              child: Container(
-                                width: 55,
-                                height: 55,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: Color(0xFF00BCD4).withOpacity(0.5),
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        // Center progress
-                        SizedBox(
-                          width: 35,
-                          height: 35,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 3,
-                            backgroundColor: Colors.white.withOpacity(0.1),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Text(
-                      'ವಿಶ್ವಬಂಧು ಮಾರುತಿಸಿದ್ಧ',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.9),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                        letterSpacing: 2,
-                        shadows: [
-                          Shadow(
-                            color: Color(0xFFFF6F00).withOpacity(0.8),
-                            blurRadius: 10,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
           ],
         ),
       ),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'admin_main_screen.dart';
+import 'auth_helper.dart';
 import 'home_screen.dart';
 import 'admin_screen.dart';
 
@@ -54,14 +56,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
       setState(() {
         _isOtpSent = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('OTP Sent! (Use 123456 for User, 654321 for Admin)'),
-          backgroundColor: const Color(0xFF4A148C),
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      );
+
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -74,8 +69,27 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     }
   }
 
-  void _verifyOtp() {
+  void _verifyOtp() async { // Add async
     String inputOtp = _otpController.text;
+
+    if (inputOtp == _userOtp) {
+      // SAVE DATA HERE
+      await AuthHelper.saveLoginData(
+        phoneNumber: _phoneController.text,
+        userType: AuthHelper.userTypeNormal,
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+    } else if (inputOtp == _adminOtp) {
+      // SAVE DATA HERE
+      await AuthHelper.saveLoginData(
+        phoneNumber: _phoneController.text,
+        userType: AuthHelper.userTypeAdmin,
+      );
+      if (!mounted) return;
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminMainScreen()));
+    }
+
 
     if (inputOtp == _userOtp) {
       Navigator.pushReplacement(
@@ -85,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     } else if (inputOtp == _adminOtp) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const AdminScreen()),
+        MaterialPageRoute(builder: (context) => const AdminMainScreen()),  // <-- Changed this
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
