@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
-import 'person_data.dart'; // Import shared data model
+import 'person_data.dart';
 
 class CardsScreen extends StatefulWidget {
   const CardsScreen({super.key});

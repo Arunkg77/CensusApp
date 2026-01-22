@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
-import 'splash_screen.dart'; // Import the newly created splash screen
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'splash_screen.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Supabase.initialize(
+    url: 'https://xmhclankqtztjjpxgque.supabase.co',
+    anonKey: 'sb_publishable_9zhfvbKW-Av9gH5uYmidcA_Mn-BmhZx',
+  );
+
   runApp(const MyApp());
 }
 
@@ -13,7 +21,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'TSM-1108',
-      // Change 'home' to SplashScreen
       home: const SplashScreen(),
     );
   }

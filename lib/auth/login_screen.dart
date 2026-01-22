@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'admin_main_screen.dart';
+
+import '../admin_screen/admin_main_screen.dart';
+import '../users/home_Screen.dart';
 import 'auth_helper.dart';
-import 'home_screen.dart';
-import 'admin_screen.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -69,46 +72,47 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
     }
   }
 
-  void _verifyOtp() async { // Add async
+  void _verifyOtp() async {
     String inputOtp = _otpController.text;
+    final supabase = Supabase.instance.client; // Get supabase instance
 
-    if (inputOtp == _userOtp) {
-      // SAVE DATA HERE
-      await AuthHelper.saveLoginData(
-        phoneNumber: _phoneController.text,
-        userType: AuthHelper.userTypeNormal,
-      );
-      if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
-    } else if (inputOtp == _adminOtp) {
-      // SAVE DATA HERE
-      await AuthHelper.saveLoginData(
-        phoneNumber: _phoneController.text,
-        userType: AuthHelper.userTypeAdmin,
-      );
-      if (!mounted) return;
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminMainScreen()));
-    }
+    try {
+      if (inputOtp == _userOtp || inputOtp == _adminOtp) {
+        // 1. Sign in to Supabase internally to satisfy the 'authenticated' requirement
+        await supabase.auth.signInAnonymously();
 
+        // 2. Save your existing local login data
+        String userType = inputOtp == _userOtp
+            ? AuthHelper.userTypeNormal
+            : AuthHelper.userTypeAdmin;
 
-    if (inputOtp == _userOtp) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
-    } else if (inputOtp == _adminOtp) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const AdminMainScreen()),  // <-- Changed this
-      );
-    } else {
+        await AuthHelper.saveLoginData(
+          phoneNumber: _phoneController.text,
+          userType: userType,
+        );
+
+        if (!mounted) return;
+
+        // 3. Navigate to respective screens
+        if (userType == AuthHelper.userTypeAdmin) {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const AdminMainScreen()));
+        } else {
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const HomeScreen()));
+        }
+      } else {
+        // Show invalid OTP message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('Invalid OTP. Please try again.'),
+            backgroundColor: Colors.red[900],
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Invalid OTP. Please try again.'),
-          backgroundColor: Colors.red[900],
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+        SnackBar(content: Text('Auth Error: $e'), backgroundColor: Colors.red),
       );
     }
   }

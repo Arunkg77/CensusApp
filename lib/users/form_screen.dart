@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
-import 'person_data.dart'; // Import shared data model
+import 'package:taralabalushishyamandali/users/services/supabase_service%20.dart';
+import 'person_data.dart';
 
 class FormScreen extends StatefulWidget {
   final Function(PersonData head, List<PersonData> members) onDataSubmitted;
@@ -18,6 +19,7 @@ class _FormScreenState extends State<FormScreen> {
   final _formKey = GlobalKey<FormState>();
   PersonData headOfHousehold = PersonData();
   List<PersonData> familyMembers = [];
+  bool _isSubmitting = false; // Track submission state
 
   void _onMemberCountChanged(int? newCount) {
     if (newCount == null) return;
@@ -42,152 +44,259 @@ class _FormScreenState extends State<FormScreen> {
     });
   }
 
-  void _submitForm() {
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-      widget.onDataSubmitted(headOfHousehold, familyMembers);
+
+      setState(() {
+        _isSubmitting = true;
+      });
+
+      try {
+        // Submit data to Supabase
+        final result = await SupabaseService.submitHouseholdData(
+          head: headOfHousehold,
+          members: familyMembers,
+        );
+
+        if (!mounted) return;
+
+        if (result['success']) {
+          // Call the original callback to update cards
+          widget.onDataSubmitted(headOfHousehold, familyMembers);
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Survey Submitted Successfully! / ಸಮೀಕ್ಷೆ ಯಶಸ್ವಿಯಾಗಿ ಸಲ್ಲಿಸಲಾಗಿದೆ!'),
+              backgroundColor: Colors.green,
+              duration: Duration(seconds: 3),
+            ),
+          );
+
+          // Optional: Reset form after successful submission
+          // _resetForm();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Submission Failed: ${result['message']}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 4),
+            ),
+          );
+        }
+      } catch (e) {
+        if (!mounted) return;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 4),
+          ),
+        );
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isSubmitting = false;
+          });
+        }
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Survey Submitted! / ಸಮೀಕ್ಷೆ ಸಲ್ಲಿಸಲಾಗಿದೆ!'),
-          backgroundColor: Colors.teal,
+          content: Text('Please fill all required fields / ದಯವಿಟ್ಟು ಎಲ್ಲಾ ಅಗತ್ಯ ಕ್ಷೇತ್ರಗಳನ್ನು ಭರ್ತಿ ಮಾಡಿ'),
+          backgroundColor: Colors.orange,
         ),
       );
     }
+  }
+
+  void _resetForm() {
+    setState(() {
+      headOfHousehold = PersonData();
+      familyMembers.clear();
+      _formKey.currentState?.reset();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[200],
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              _buildSectionHeader(AppLabels.headTitle),
-              PersonDetailForm(
-                key: ObjectKey(headOfHousehold),
-                data: headOfHousehold,
-                isHead: true,
-                index: 0,
-                onRemove: () {},
-              ),
-              const SizedBox(height: 25),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _buildSectionHeader(AppLabels.headTitle),
+                  PersonDetailForm(
+                    key: ObjectKey(headOfHousehold),
+                    data: headOfHousehold,
+                    isHead: true,
+                    index: 0,
+                    onRemove: () {},
+                  ),
+                  const SizedBox(height: 25),
 
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.teal.shade200),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            AppLabels.memberTitle,
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal.shade800,
-                            ),
-                          ),
-                          const Text(
-                            "Select total extra members / ಒಟ್ಟು ಸದಸ್ಯರನ್ನು ಆಯ್ಕೆಮಾಡಿ",
-                            style: TextStyle(fontSize: 10, color: Colors.grey),
-                          ),
-                        ],
-                      ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.teal.shade200),
                     ),
-                    const SizedBox(width: 15),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.teal.shade50,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.teal),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<int>(
-                          value: familyMembers.length,
-                          icon: const Icon(Icons.people, color: Colors.teal),
-                          onChanged: _onMemberCountChanged,
-                          items: List.generate(11, (index) {
-                            return DropdownMenuItem<int>(
-                              value: index,
-                              child: Text(
-                                "$index",
-                                style: const TextStyle(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                AppLabels.memberTitle,
+                                style: TextStyle(
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Colors.teal,
+                                  color: Colors.teal.shade800,
                                 ),
                               ),
-                            );
-                          }),
+                              const Text(
+                                "Select total extra members / ಒಟ್ಟು ಸದಸ್ಯರನ್ನು ಆಯ್ಕೆಮಾಡಿ",
+                                style: TextStyle(fontSize: 10, color: Colors.grey),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 15),
-
-              if (familyMembers.isEmpty)
-                Padding(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        Icon(Icons.family_restroom, size: 40, color: Colors.grey[400]),
-                        const SizedBox(height: 10),
-                        const Text(
-                          "No extra members selected\nಯಾವುದೇ ಸದಸ್ಯರನ್ನು ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey),
+                        const SizedBox(width: 15),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.teal.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.teal),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<int>(
+                              value: familyMembers.length,
+                              icon: const Icon(Icons.people, color: Colors.teal),
+                              onChanged: _isSubmitting ? null : _onMemberCountChanged,
+                              items: List.generate(11, (index) {
+                                return DropdownMenuItem<int>(
+                                  value: index,
+                                  child: Text(
+                                    "$index",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                      color: Colors.teal,
+                                    ),
+                                  ),
+                                );
+                              }),
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
 
-              ...List.generate(familyMembers.length, (index) {
-                return PersonDetailForm(
-                  key: ObjectKey(familyMembers[index]),
-                  data: familyMembers[index],
-                  isHead: false,
-                  index: index,
-                  onRemove: () => _removeFamilyMember(index),
-                );
-              }),
+                  const SizedBox(height: 15),
 
-              const SizedBox(height: 30),
-              SizedBox(
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  if (familyMembers.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.all(30.0),
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.family_restroom, size: 40, color: Colors.grey[400]),
+                            const SizedBox(height: 10),
+                            const Text(
+                              "No extra members selected\nಯಾವುದೇ ಸದಸ್ಯರನ್ನು ಆಯ್ಕೆ ಮಾಡಿಲ್ಲ",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  ...List.generate(familyMembers.length, (index) {
+                    return PersonDetailForm(
+                      key: ObjectKey(familyMembers[index]),
+                      data: familyMembers[index],
+                      isHead: false,
+                      index: index,
+                      onRemove: () => _removeFamilyMember(index),
+                    );
+                  }),
+
+                  const SizedBox(height: 30),
+                  SizedBox(
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null : _submitForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        disabledBackgroundColor: Colors.grey,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      ),
+                      child: _isSubmitting
+                          ? const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                          SizedBox(width: 12),
+                          Text(
+                            'Submitting... / ಸಲ್ಲಿಸಲಾಗುತ್ತಿದೆ...',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ],
+                      )
+                          : const Text(
+                        AppLabels.submit,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
-                  child: const Text(
-                    AppLabels.submit,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                  const SizedBox(height: 50),
+                ],
+              ),
+            ),
+          ),
+
+          // Loading overlay
+          if (_isSubmitting)
+            Container(
+              color: Colors.black26,
+              child: const Center(
+                child: Card(
+                  child: Padding(
+                    padding: EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 16),
+                        Text('Uploading data...\nದತ್ತಾಂಶವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಲಾಗುತ್ತಿದೆ...'),
+                      ],
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 50),
-            ],
-          ),
-        ),
+            ),
+        ],
       ),
     );
   }
@@ -208,7 +317,7 @@ class _FormScreenState extends State<FormScreen> {
   }
 }
 
-// --- Form Widget ---
+// --- Form Widget (PersonDetailForm remains the same) ---
 class PersonDetailForm extends StatefulWidget {
   final PersonData data;
   final bool isHead;
