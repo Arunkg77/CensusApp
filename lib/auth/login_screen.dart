@@ -74,12 +74,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   void _verifyOtp() async {
     String inputOtp = _otpController.text;
-    final supabase = Supabase.instance.client; // Get supabase instance
+    // final supabase = Supabase.instance.client; // Get supabase instance
 
     try {
       if (inputOtp == _userOtp || inputOtp == _adminOtp) {
         // 1. Sign in to Supabase internally to satisfy the 'authenticated' requirement
-        await supabase.auth.signInAnonymously();
+        // await supabase.auth.signInAnonymously();
 
         // 2. Save your existing local login data
         String userType = inputOtp == _userOtp
@@ -255,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         const FittedBox(
                           fit: BoxFit.scaleDown,
                           child: Text(
-                            'ಓಂ ನಮಃ ಶಿವಾಯ',
+                            '',
                             style: TextStyle(
                               fontSize: 36,
                               fontWeight: FontWeight.bold,

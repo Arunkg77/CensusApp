@@ -54,7 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('TSM-1108'),
+        title: const Text('Census APP'),
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
         actions: [

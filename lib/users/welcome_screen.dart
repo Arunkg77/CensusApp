@@ -6,40 +6,40 @@ class WelcomeScreen extends StatelessWidget {
   // Vachanas from Lingayat saints
   final List<Map<String, dynamic>> vachanas = const [
     {
-      'message': 'ಕಾಯವೇ ಕೈಲಾಸ ಕಾಯವೇ ಕೈಲಾಸ\nಕಾಯವೇ ಕೂಡಲಸಂಗಮದೇವನ ನಿವಾಸ\n\nThe body itself is Kailasa, the body itself is the abode of Kudalasangamadeva.',
-      'author': 'ಬಸವಣ್ಣ (Basavanna)',
-      'timestamp': 'ಶರಣ ಸಂದೇಶ',
-      'isImportant': true,
+      "message": "Doing something without purpose is just wasting time. Know why you do things.",
+      "author": "Anonymous",
+      "timestamp": "Life Message",
+      "isImportant": false
     },
     {
-      'message': 'ಉಳ್ಳವರು ಶಿವಾಲಯವ ಮಾಡುವರು, ನಾನೇನು ಮಾಡಲಿ ಬಡವನಯ್ಯಾ?\nಎನ್ನ ಕಾಲೇ ಕಂಬ, ದೇಹವೇ ದೇಗುಲ, ಶಿರವೇ ಹೊನ್ನ ಕಳಸವಯ್ಯಾ,\nಕೂಡಲಸಂಗಮದೇವಾ, ಕೇಳಯ್ಯಾ, ಸ್ಥಾವರಕ್ಕಳಿವುಂಟು, ಜಂಗಮಕ್ಕಳಿವಿಲ್ಲ.\n\nThe rich will make temples for Shiva. What shall I, a poor man, do? My legs are pillars, the body the shrine, the head a cupola of gold. Listen, O lord of the meeting rivers, things standing shall fall, but the moving ever shall stay.',
-      'author': 'ಬಸವಣ್ಣ (Basavanna)',
-      'timestamp': 'ಶರಣ ಸಂದೇಶ',
-      'isImportant': true,
+      "message": "Doing something without purpose is just wasting time. Know why you do things.",
+      "author": "Anonymous",
+      "timestamp": "Life Message",
+      "isImportant": false
     },
     {
-      'message': 'ಬಾಯಿ ಮುಚ್ಚಿದೆಯಾದರೆ ಶಿವಾರಾಧನೆಯಲ್ಲ,\nಮುಂಗೋಪವಿದ್ದರೆ ಶಿವಾರಾಧನೆಯಲ್ಲ,\nಅರಿವಿಲ್ಲದ ಪೂಜೆ ಶಿವಾರಾಧನೆಯಲ್ಲ.\n\nClosing the mouth is not worshipping Shiva,\nHaving anger is not worshipping Shiva,\nWorship without understanding is not worshipping Shiva.',
-      'author': 'ಅಕ್ಕ ಮಹಾದೇವಿ (Akka Mahadevi)',
-      'timestamp': 'ಶರಣ ಸಂದೇಶ',
-      'isImportant': false,
+      "message": "Doing something without purpose is just wasting time. Know why you do things.",
+      "author": "Anonymous",
+      "timestamp": "Life Message",
+      "isImportant": false
     },
     {
-      'message': 'ಕೈ ಬಳಲಿಕೊಂಡು ಊಟವೆಂಬುದಿಲ್ಲ,\nಕಾಲು ಬಳಲಿಕೊಂಡು ಚಲನವೆಂಬುದಿಲ್ಲ,\nಹಾಗೆಯೇ ಹೃದಯ ಬಳಲಿಕೊಂಡು ಭಕ್ತಿಯೆಂಬುದಿಲ್ಲ.\n\nUsing hands is not called eating,\nUsing legs is not called walking,\nSimilarly, using heart is not called devotion.',
-      'author': 'ಅಲ್ಲಮ ಪ್ರಭು (Allama Prabhu)',
-      'timestamp': 'ಶರಣ ಸಂದೇಶ',
-      'isImportant': false,
+      "message": "Doing something without purpose is just wasting time. Know why you do things.",
+      "author": "Anonymous",
+      "timestamp": "Life Message",
+      "isImportant": false
     },
     {
-      'message': 'ಕಲ್ಲು ಕರಗಿ ನೀರಾದರೆ ನಂಬುವೆನು,\nನೀರು ಹೆಪ್ಪಿ ಕಲ್ಲಾದರೆ ನಂಬುವೆನು,\nಆದರೆ ಜಂಗಮ ಲಿಂಗವೇ ಅರಿದೆನು.\n\nIf stone melts and becomes water, I will believe,\nIf water freezes and becomes stone, I will believe,\nBut I have known that the Jangama is the Linga.',
-      'author': 'ಬಸವಣ್ಣ (Basavanna)',
-      'timestamp': 'ಶರಣ ಸಂದೇಶ',
-      'isImportant': true,
+      "message": "Doing something without purpose is just wasting time. Know why you do things.",
+      "author": "Anonymous",
+      "timestamp": "Life Message",
+      "isImportant": false
     },
     {
-      'message': 'ಬೇಡದಿರು ಬೇಡದಿರು ಜನರ ಮುಂದೆ,\nಕೊಡದಿರು ಕೊಡದಿರು ಮರುಳ ಬುದ್ಧಿಯನು,\nಹುಡುಕಾಡು ಹುಡುಕಾಡು ಗುಹೇಶ್ವರನ ಪಾದವನು.\n\nDo not beg, do not beg before people,\nDo not give, do not give foolish advice,\nSearch, search for the feet of Guheshwara.',
-      'author': 'ಚನ್ನಬಸವಣ್ಣ (Channabasavanna)',
-      'timestamp': 'ಶರಣ ಸಂದೇಶ',
-      'isImportant': false,
+      "message": "Doing something without purpose is just wasting time. Know why you do things.",
+      "author": "Anonymous",
+      "timestamp": "Life Message",
+      "isImportant": false
     },
   ];
 
@@ -96,7 +96,7 @@ class WelcomeScreen extends StatelessWidget {
                             Row(
                               children: [
                                 Text(
-                                  '🕉️',
+                                  '',
                                   style: TextStyle(fontSize: 24),
                                 ),
                                 const SizedBox(width: 8),
@@ -111,7 +111,7 @@ class WelcomeScreen extends StatelessWidget {
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      'ಪ್ರಮುಖ',
+                                      '',
                                       style: TextStyle(
                                         color: Colors.deepOrange[900],
                                         fontSize: 11,
