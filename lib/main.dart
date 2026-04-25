@@ -5,10 +5,10 @@ import 'splash_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // await Supabase.initialize(
-  //   url: 'https://xmhclankqtztjjpxgque.supabase.co',
-  //   anonKey: 'sb_publishable_9zhfvbKW-Av9gH5uYmidcA_Mn-BmhZx',
-  // );
+  await Supabase.initialize(
+    url: 'https://xmhclankqtztjjpxgque.supabase.co',
+    anonKey: 'sb_publishable_9zhfvbKW-Av9gH5uYmidcA_Mn-BmhZx',
+  );
 
   runApp(const MyApp());
 }
